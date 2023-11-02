@@ -58,6 +58,18 @@ inline void buffer_free(Buffer *t_buffer) { free(t_buffer); }
 /// @return void*
 void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes);
 
+/// @brief Resize some old data insdie an arena
+///
+/// The allocated data are stored in a buffer.
+/// If the data is too big, a new buffer will be created.
+///
+/// @param t_arena The arena where data gets allocated
+/// @param t_old_ptr The old ptr where the data is held
+/// @param t_old_size_in_bytes The size of the old pointer
+/// @param t_new_size_in_bytes The size of the new pointer
+void *arena_realloc(Arena *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
+                    size_t t_new_size_in_bytes);
+
 /// @brief Resets the allocated chunk count of an arena
 /// @param t_arena The arena that will be resetted
 /// @retrun void
@@ -99,6 +111,23 @@ void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes) {
 
   void *result = &(t_arena->end->m_data[t_arena->end->m_chunk_current_count]);
   t_arena->end->m_chunk_current_count += chunk_count;
+  return result;
+}
+
+void *arena_realloc(Arena *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
+                    size_t t_new_size_in_bytes) {
+  if (t_old_size_in_bytes >= t_new_size_in_bytes) {
+    return t_old_ptr;
+  }
+
+  void *result = arena_alloc(t_arena, t_new_size_in_bytes);
+  char *old_ptr_bytes = t_old_ptr;
+  char *new_ptr_bytes = result;
+
+  for (size_t i = 0; i < t_old_size_in_bytes; ++i) {
+    new_ptr_bytes[i] = old_ptr_bytes[i];
+  }
+
   return result;
 }
 
