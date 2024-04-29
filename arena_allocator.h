@@ -35,7 +35,7 @@ struct Arena {
   /// contains the starting buffer
   Buffer *m_begin;
   /// contains the active buffer
-  Buffer *end;
+  Buffer *m_active;
 };
 
 /// @brief Creates a new buffer, where chunks of bytes are allocated
@@ -99,18 +99,18 @@ void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes) {
   t_size_in_bytes = t_size_in_bytes + (sizeof(uintptr_t) - 1);
   size_t chunk_count = t_size_in_bytes / sizeof(uintptr_t);
 
-  if (t_arena->end == nullptr) {
+  if (t_arena->m_active == nullptr) {
     // If there is no active buffer in an arena, there also should not be a
     // starting buffer
     assert(t_arena->m_begin == nullptr);
     size_t chunk_max_count = DEFAULT_CHUNK_MAX_COUNT;
     if (chunk_max_count < chunk_count) chunk_max_count = chunk_count;
-    t_arena->end = buffer_new(chunk_max_count);
-    t_arena->m_begin = t_arena->end;
+    t_arena->m_active = buffer_new(chunk_max_count);
+    t_arena->m_begin = t_arena->m_active;
   }
 
-  void *result = &(t_arena->end->m_data[t_arena->end->m_chunk_current_count]);
-  t_arena->end->m_chunk_current_count += chunk_count;
+  void *result = &(t_arena->m_active->m_data[t_arena->m_active->m_chunk_current_count]);
+  t_arena->m_active->m_chunk_current_count += chunk_count;
   return result;
 }
 
@@ -152,7 +152,7 @@ void arena_free(Arena *t_arena) {
   // does not cause undefined behaviours, even though accessing
   // null values do cause them too, it is more easily debuggable.
   t_arena->m_begin = nullptr;
-  t_arena->end = nullptr;
+  t_arena->m_active = nullptr;
 }
 
 #endif  // ARENA_ALLOCATOR_IMPLEMENTATION
