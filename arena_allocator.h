@@ -23,6 +23,12 @@ typedef struct Arena Arena;
 #define arena_alloc_arr(arena, type, count) \
   ((type *)arena_alloc(arena, sizeof(type) * count))
 
+/// @brief Allocates a struct in an arena
+/// @param arena The arena where data gets allocated
+/// @param type The struct
+#define arena_alloc_struct(arena, type) \
+  ((type *)arena_alloc(arena, sizeof(type)))
+
 /// @brief Holds data as uintptr(usually 8 byte) chunks.
 ///
 /// Buffers are just like nodes in a linked list
