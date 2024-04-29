@@ -16,6 +16,13 @@
 typedef struct Buffer Buffer;
 typedef struct Arena Arena;
 
+/// @brief Allocates an array in an arena
+/// @param arena The arena where data gets allocated
+/// @param type The type of the array
+/// @param count The number of elements in the array
+#define arena_alloc_arr(arena, type, count) \
+  ((type *)arena_alloc(arena, sizeof(type) * count))
+
 /// @brief Holds data as uintptr(usually 8 byte) chunks.
 ///
 /// Buffers are just like nodes in a linked list
