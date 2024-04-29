@@ -30,10 +30,10 @@ struct Buffer {
 /// @brief Arena is just a growing list of buffers.
 ///
 /// An arena usually looks like this:
-/// begin -> next buffer -> active buffer
+/// m_begin -> next buffer -> active buffer
 struct Arena {
   /// contains the starting buffer
-  Buffer *begin;
+  Buffer *m_begin;
   /// contains the active buffer
   Buffer *end;
 };
@@ -102,11 +102,11 @@ void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes) {
   if (t_arena->end == nullptr) {
     // If there is no active buffer in an arena, there also should not be a
     // starting buffer
-    assert(t_arena->begin == nullptr);
+    assert(t_arena->m_begin == nullptr);
     size_t chunk_max_count = DEFAULT_CHUNK_MAX_COUNT;
     if (chunk_max_count < chunk_count) chunk_max_count = chunk_count;
     t_arena->end = buffer_new(chunk_max_count);
-    t_arena->begin = t_arena->end;
+    t_arena->m_begin = t_arena->end;
   }
 
   void *result = &(t_arena->end->m_data[t_arena->end->m_chunk_current_count]);
@@ -132,7 +132,7 @@ void *arena_realloc(Arena *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
 }
 
 void arena_reset(Arena *t_arena) {
-  Buffer *current_buffer = t_arena->begin;
+  Buffer *current_buffer = t_arena->m_begin;
   while (current_buffer != nullptr) {
     current_buffer->m_chunk_current_count = 0;
     current_buffer = current_buffer->m_next;
@@ -140,7 +140,7 @@ void arena_reset(Arena *t_arena) {
 }
 
 void arena_free(Arena *t_arena) {
-  Buffer *current_buffer = t_arena->begin;
+  Buffer *current_buffer = t_arena->m_begin;
   while (current_buffer->m_next != nullptr) {
     Buffer *next_buffer = current_buffer->m_next;
     free(current_buffer);
@@ -151,7 +151,7 @@ void arena_free(Arena *t_arena) {
   // because this ensures that by accessing any freed pointers
   // does not cause undefined behaviours, even though accessing
   // null values do cause them too, it is more easily debuggable.
-  t_arena->begin = nullptr;
+  t_arena->m_begin = nullptr;
   t_arena->end = nullptr;
 }
 
