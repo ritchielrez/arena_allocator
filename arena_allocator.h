@@ -129,7 +129,11 @@ void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes) {
 
 void *arena_realloc(Arena *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
                     size_t t_new_size_in_bytes) {
-  if (t_old_size_in_bytes >= t_new_size_in_bytes) {
+  t_old_size_in_bytes = t_old_size_in_bytes + (sizeof(uintptr_t) - 1);
+  size_t old_chunk_count = t_old_size_in_bytes / sizeof(uintptr_t);
+  t_new_size_in_bytes = t_new_size_in_bytes + (sizeof(uintptr_t) - 1);
+  size_t new_chunk_count = t_new_size_in_bytes / sizeof(uintptr_t);
+  if (old_chunk_count >= new_chunk_count) {
     return t_old_ptr;
   }
 
