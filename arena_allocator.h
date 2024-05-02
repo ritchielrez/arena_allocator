@@ -108,6 +108,10 @@ Buffer *buffer_new(size_t t_chunk_count) {
 }
 
 void *arena_alloc(void *t_arena, size_t t_size_in_bytes) {
+  if (t_arena == nullptr) {
+    fprintf(stderr, "Error, no valid arena was provided\n");
+    exit(EXIT_FAILURE);
+  }
   Arena *arena = (Arena *)t_arena;
 
   // To understand the following code, you need to have proper knowledge about
@@ -141,6 +145,11 @@ void *arena_alloc(void *t_arena, size_t t_size_in_bytes) {
 
 void *arena_realloc(void *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
                     size_t t_new_size_in_bytes) {
+  if (t_arena == nullptr) {
+    fprintf(stderr, "Error, no valid arena was provided\n");
+    exit(EXIT_FAILURE);
+  }
+
   t_old_size_in_bytes = t_old_size_in_bytes + (sizeof(uintptr_t) - 1);
   size_t old_chunk_count = t_old_size_in_bytes / sizeof(uintptr_t);
   t_new_size_in_bytes = t_new_size_in_bytes + (sizeof(uintptr_t) - 1);
@@ -161,6 +170,11 @@ void *arena_realloc(void *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
 }
 
 void arena_reset(Arena *t_arena) {
+  if (t_arena == nullptr) {
+    fprintf(stderr, "Error, no valid arena was provided\n");
+    exit(EXIT_FAILURE);
+  }
+
   Buffer *current_buffer = t_arena->m_begin;
   while (current_buffer != nullptr) {
     current_buffer->m_chunk_current_count = 0;
@@ -169,7 +183,10 @@ void arena_reset(Arena *t_arena) {
 }
 
 void arena_free(void *t_arena) {
-  Buffer *current_buffer = t_arena->m_begin;
+  if (t_arena == nullptr) {
+    fprintf(stderr, "Error, no valid arena was provided\n");
+    exit(EXIT_FAILURE);
+  }
   Arena *arena = (Arena *)t_arena;
 
   Buffer *current_buffer = arena->m_begin;
