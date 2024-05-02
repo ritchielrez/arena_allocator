@@ -69,7 +69,7 @@ inline void buffer_free(Buffer *t_buffer) { free(t_buffer); }
 /// @param t_arena The arena where data gets allocated
 /// @param t_size_in_bytes The requested number of bytes to be allocated
 /// @return void*
-void *arena_alloc(void *t_arena, size_t t_size_in_bytes);
+void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes);
 
 /// @brief Resize some old data insdie an arena
 ///
@@ -81,7 +81,7 @@ void *arena_alloc(void *t_arena, size_t t_size_in_bytes);
 /// @param t_old_size_in_bytes The size of the old pointer
 /// @param t_new_size_in_bytes The size of the new pointer
 /// @return void*
-void *arena_realloc(void *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
+void *arena_realloc(Arena *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
                     size_t t_new_size_in_bytes);
 
 /// @brief Resets the allocated chunk count of an arena
@@ -92,7 +92,7 @@ void arena_reset(Arena *t_arena);
 /// @brief Frees up an arena
 /// @param t_arena The arena that will be freed
 /// @return void
-void arena_free(void *t_arena);
+void arena_free(Arena *t_arena);
 
 #ifdef ARENA_ALLOCATOR_IMPLEMENTATION
 
