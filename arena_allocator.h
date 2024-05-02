@@ -107,7 +107,7 @@ Buffer *buffer_new(size_t t_chunk_count) {
   return new_buffer;
 }
 
-void *arena_alloc(void *t_arena, size_t t_size_in_bytes) {
+void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes) {
   if (t_arena == nullptr) {
     fprintf(stderr, "Error, no valid arena was provided\n");
     exit(EXIT_FAILURE);
@@ -143,7 +143,7 @@ void *arena_alloc(void *t_arena, size_t t_size_in_bytes) {
   return result;
 }
 
-void *arena_realloc(void *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
+void *arena_realloc(Arena *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
                     size_t t_new_size_in_bytes) {
   if (t_arena == nullptr) {
     fprintf(stderr, "Error, no valid arena was provided\n");
@@ -182,7 +182,7 @@ void arena_reset(Arena *t_arena) {
   }
 }
 
-void arena_free(void *t_arena) {
+void arena_free(Arena *t_arena) {
   if (t_arena == nullptr) {
     fprintf(stderr, "Error, no valid arena was provided\n");
     exit(EXIT_FAILURE);
