@@ -80,13 +80,13 @@ void *arena_alloc(void *t_arena, size_t t_size_in_bytes);
 /// @param t_old_ptr The old ptr where the data is held
 /// @param t_old_size_in_bytes The size of the old pointer
 /// @param t_new_size_in_bytes The size of the new pointer
-void *arena_realloc(Arena *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
+/// @return void*
 void *arena_realloc(void *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
                     size_t t_new_size_in_bytes);
 
 /// @brief Resets the allocated chunk count of an arena
 /// @param t_arena The arena that will be resetted
-/// @retrun void
+/// @return void
 void arena_reset(Arena *t_arena);
 
 /// @brief Frees up an arena
