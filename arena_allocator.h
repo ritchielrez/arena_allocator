@@ -69,7 +69,7 @@ inline void buffer_free(Buffer *t_buffer) { free(t_buffer); }
 /// @param t_arena The arena where data gets allocated
 /// @param t_size_in_bytes The requested number of bytes to be allocated
 /// @return void*
-void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes);
+void *arena_alloc(void *t_arena, size_t t_size_in_bytes);
 
 /// @brief Resize some old data insdie an arena
 ///
@@ -81,6 +81,7 @@ void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes);
 /// @param t_old_size_in_bytes The size of the old pointer
 /// @param t_new_size_in_bytes The size of the new pointer
 void *arena_realloc(Arena *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
+void *arena_realloc(void *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
                     size_t t_new_size_in_bytes);
 
 /// @brief Resets the allocated chunk count of an arena
@@ -91,7 +92,7 @@ void arena_reset(Arena *t_arena);
 /// @brief Frees up an arena
 /// @param t_arena The arena that will be freed
 /// @return void
-void arena_free(Arena *t_arena);
+void arena_free(void *t_arena);
 
 #ifdef ARENA_ALLOCATOR_IMPLEMENTATION
 
@@ -106,28 +107,39 @@ Buffer *buffer_new(size_t t_chunk_count) {
   return new_buffer;
 }
 
-void *arena_alloc(Arena *t_arena, size_t t_size_in_bytes) {
+void *arena_alloc(void *t_arena, size_t t_size_in_bytes) {
+  Arena *arena = (Arena *)t_arena;
+
   // To understand the following code, you need to have proper knowledge about
   // memory alignment. Align the requsted size to 8 bytes
   t_size_in_bytes = t_size_in_bytes + (sizeof(uintptr_t) - 1);
   size_t chunk_count = t_size_in_bytes / sizeof(uintptr_t);
 
-  if (t_arena->m_active == nullptr) {
+  if (arena->m_active == nullptr) {
     // If there is no active buffer in an arena, there also should not be a
     // starting buffer
-    assert(t_arena->m_begin == nullptr);
+    assert(arena->m_begin == nullptr);
     size_t chunk_max_count = DEFAULT_CHUNK_MAX_COUNT;
     if (chunk_max_count < chunk_count) chunk_max_count = chunk_count;
-    t_arena->m_active = buffer_new(chunk_max_count);
-    t_arena->m_begin = t_arena->m_active;
+    arena->m_active = buffer_new(chunk_max_count);
+    arena->m_begin = arena->m_active;
   }
 
-  void *result = &(t_arena->m_active->m_data[t_arena->m_active->m_chunk_current_count]);
-  t_arena->m_active->m_chunk_current_count += chunk_count;
+  if (arena->m_active->m_chunk_current_count + chunk_count >
+      arena->m_active->m_chunk_max_count) {
+    size_t chunk_max_count = DEFAULT_CHUNK_MAX_COUNT;
+    if (chunk_max_count < chunk_count) chunk_max_count = chunk_count;
+    arena->m_active->m_next = buffer_new(chunk_max_count);
+    arena->m_active = arena->m_active->m_next;
+  }
+
+  void *result =
+      &(arena->m_active->m_data[arena->m_active->m_chunk_current_count]);
+  arena->m_active->m_chunk_current_count += chunk_count;
   return result;
 }
 
-void *arena_realloc(Arena *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
+void *arena_realloc(void *t_arena, void *t_old_ptr, size_t t_old_size_in_bytes,
                     size_t t_new_size_in_bytes) {
   t_old_size_in_bytes = t_old_size_in_bytes + (sizeof(uintptr_t) - 1);
   size_t old_chunk_count = t_old_size_in_bytes / sizeof(uintptr_t);
@@ -156,10 +168,15 @@ void arena_reset(Arena *t_arena) {
   }
 }
 
-void arena_free(Arena *t_arena) {
+void arena_free(void *t_arena) {
   Buffer *current_buffer = t_arena->m_begin;
+  Arena *arena = (Arena *)t_arena;
+
+  Buffer *current_buffer = arena->m_begin;
   while (current_buffer->m_next != nullptr) {
     Buffer *next_buffer = current_buffer->m_next;
+    current_buffer->m_chunk_max_count = 0;
+    current_buffer->m_chunk_current_count = 0;
     free(current_buffer);
     current_buffer = next_buffer;
   }
@@ -168,8 +185,8 @@ void arena_free(Arena *t_arena) {
   // because this ensures that by accessing any freed pointers
   // does not cause undefined behaviours, even though accessing
   // null values do cause them too, it is more easily debuggable.
-  t_arena->m_begin = nullptr;
-  t_arena->m_active = nullptr;
+  arena->m_begin = nullptr;
+  arena->m_active = nullptr;
 }
 
 #endif  // ARENA_ALLOCATOR_IMPLEMENTATION
