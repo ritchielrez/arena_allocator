@@ -37,7 +37,7 @@ struct Buffer {
   size_t m_chunk_max_count;
   size_t m_chunk_current_count;
   /// holds the actual memory chunks, where user data is stored
-  uintptr_t m_data[];
+  uintptr_t *m_data;
 };
 
 /// @brief Arena is just a growing list of buffers.
