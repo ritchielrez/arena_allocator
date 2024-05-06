@@ -16,7 +16,6 @@ Without freeing the whole memory, we can reset the counters of the buffers in an
 This **arena allocator** uses a **monotonic allocator** to allocate memory in buffers.
 
 ### How to use this library
-
 Just copy and past the file `arena_allocator.h` in your project. Then add these lines to your
 source files: 
 ```cpp
