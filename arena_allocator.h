@@ -29,6 +29,10 @@ typedef struct Arena Arena;
 #define arena_alloc_struct(arena, type) \
   ((type *)arena_alloc(arena, sizeof(type)))
 
+// Disable warning C4200: nonstandard extension used: zero-sized array in struct/union in MSVC
+#pragma warning(push)
+#pragma warning(disable: 4200)
+ 
 /// @brief Holds data as uintptr(usually 8 byte) chunks.
 ///
 /// Buffers are just like nodes in a linked list
@@ -39,6 +43,9 @@ struct Buffer {
   /// holds the actual memory chunks, where user data is stored
   uintptr_t m_data[];
 };
+
+// Enable the warning again
+#pragma warning(pop)
 
 /// @brief Arena is just a growing list of buffers.
 ///
