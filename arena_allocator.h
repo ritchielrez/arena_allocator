@@ -213,3 +213,5 @@ void arena_free(Arena *t_arena) {
 
 #endif  // ARENA_ALLOCATOR_IMPLEMENTATION
 #endif  // ARENA_ALLOCATOR_INCLUDED
+
+#undef nullptr
