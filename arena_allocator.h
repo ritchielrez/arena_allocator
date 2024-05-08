@@ -6,10 +6,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define true 1
-#define false 0
-
-#define nullptr 0
+#define nullptr (void *)0
 
 #define DEFAULT_CHUNK_MAX_COUNT 8192
 
@@ -29,10 +26,11 @@ typedef struct Arena Arena;
 #define arena_alloc_struct(arena, type) \
   ((type *)arena_alloc(arena, sizeof(type)))
 
-// Disable warning C4200: nonstandard extension used: zero-sized array in struct/union in MSVC
+// Disable warning C4200: nonstandard extension used: zero-sized array in
+// struct/union in MSVC
 #pragma warning(push)
-#pragma warning(disable: 4200)
- 
+#pragma warning(disable : 4200)
+
 /// @brief Holds data as uintptr(usually 8 byte) chunks.
 ///
 /// Buffers are just like nodes in a linked list
