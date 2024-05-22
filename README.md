@@ -1,6 +1,7 @@
 # arena_allocator - A custom allocator written in C
 
 ## A working implementation of arena allocator in C
+### WARNING: For the latest updates, check out this [repo](https://github.com/ritchielrez/libraries).
 
 This is an example project trying to implement **arena allocator** to improve memory
 allocation in C.
